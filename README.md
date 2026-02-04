@@ -22,7 +22,7 @@ git clone --recursive [https://github.com/ZihengMiao-Colin/gaussian-splatting](h
 cd gaussian-splatting
 
 
-2. Setup Environment
+### 2. Setup Environment
 Bash
 # Create conda environment
 conda create -n gs_5070 python=3.10
@@ -37,7 +37,7 @@ pip install "numpy<2"
 pip install scipy
 
 
-3. Apply the Patch 
+### 3. Apply the Patch 
 The default submodules are locked to old versions. You must overwrite them with the patched setup files provided in RTX5070_Patch:
 
 Copy RTX5070_Patch/setup_knn.py ➡️ Overwrite submodules/simple-knn/setup.py
@@ -45,7 +45,7 @@ Copy RTX5070_Patch/setup_knn.py ➡️ Overwrite submodules/simple-knn/setup.py
 Copy RTX5070_Patch/setup_rasterizer.py ➡️ Overwrite submodules/diff-gaussian-rasterization/setup.py
 
 
-4. Install Submodules
+### 4. Install Submodules
 Use --no-build-isolation to ensure pip uses your installed PyTorch environment.
 
 Bash
@@ -56,7 +56,7 @@ pip install ./submodules/diff-gaussian-rasterization --no-build-isolation
 pip install ./submodules/simple-knn --no-build-isolation
 
 
-5. Run Training
+### 5. Run Training
 Bash
 python train.py -s <path_to_your_dataset>
 
