@@ -18,9 +18,10 @@ import json
 from utils.system_utils import mkdir_p
 from plyfile import PlyData, PlyElement
 from utils.sh_utils import RGB2SH
-from simple_knn._C import distCUDA2
+#from simple_knn._C import distCUDA2
 from utils.graphics_utils import BasicPointCloud
 from utils.general_utils import strip_symmetric, build_scaling_rotation
+from scipy.spatial import KDTree
 
 try:
     from diff_gaussian_rasterization import SparseGaussianAdam
@@ -156,7 +157,26 @@ class GaussianModel:
 
         print("Number of points at initialisation : ", fused_point_cloud.shape[0])
 
-        dist2 = torch.clamp_min(distCUDA2(torch.from_numpy(np.asarray(pcd.points)).float().cuda()), 0.0000001)
+        # ================= 修改开始：使用 Scipy KDTree 替代 C++ simple-knn =================
+        points_np = np.asarray(pcd.points)
+        print(f"[Info] Using Scipy KDTree for initialization ({points_np.shape[0]} points)...")
+        
+        # 1. 构建 KDTree
+        tree = KDTree(points_np, leafsize=10)
+        
+        # 2. 查询最近的4个点 (第1个是自己，取后3个)
+        dists, _ = tree.query(points_np, k=4)
+        
+        # 3. 计算平均距离平方
+        mean_dists = (dists[:, 1:] ** 2).mean(axis=1)
+        
+        # 4. 转回 GPU
+        dist2 = torch.from_numpy(mean_dists).float().cuda()
+        dist2 = torch.clamp_min(dist2, 0.0000001)
+        
+        print("[Info] Initialization complete.")
+        # ================= 修改结束 =================
+
         scales = torch.log(torch.sqrt(dist2))[...,None].repeat(1, 3)
         rots = torch.zeros((fused_point_cloud.shape[0], 4), device="cuda")
         rots[:, 0] = 1
@@ -174,7 +194,6 @@ class GaussianModel:
         self.pretrained_exposures = None
         exposure = torch.eye(3, 4, device="cuda")[None].repeat(len(cam_infos), 1, 1)
         self._exposure = nn.Parameter(exposure.requires_grad_(True))
-
     def training_setup(self, training_args):
         self.percent_dense = training_args.percent_dense
         self.xyz_gradient_accum = torch.zeros((self.get_xyz.shape[0], 1), device="cuda")

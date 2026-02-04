@@ -1,3 +1,78 @@
+# 🚀 Gaussian Splatting for RTX 5070 (Blackwell)
+
+This fork is adapted to run on **NVIDIA RTX 5070** (Blackwell architecture).
+Original repository: [graphdeco-inria/gaussian-splatting](https://github.com/graphdeco-inria/gaussian-splatting)
+
+## 💻 Tested Environment
+I successfully ran the training on **Windows** with the following configuration:
+- **GPU**: NVIDIA RTX 5070 (Laptop/Desktop)
+- **CUDA Toolkit (System)**: 12.6
+- **PyTorch**: 2.5.1 (Stable, cu124)
+- **Visual Studio**: 2019 (Required for C++ compiler `cl.exe`)
+- **Python**: 3.10
+- **Crucial Dependencies**:
+  - `numpy < 2` 
+  - `scipy` 
+
+## 🛠️ How to use
+
+### 1. Clone the repo
+```bash
+git clone --recursive [https://github.com/ZihengMiao-Colin/gaussian-splatting](https://github.com/ZihengMiao-Colin/gaussian-splatting)
+cd gaussian-splatting
+
+
+2. Setup Environment
+Bash
+# Create conda environment
+conda create -n gs_5070 python=3.10
+conda activate gs_5070
+
+# Install PyTorch (Stable version recommended)
+pip install torch==2.5.1 torchvision==0.20.1 torchaudio==2.5.1 --index-url [https://download.pytorch.org/whl/cu124](https://download.pytorch.org/whl/cu124)
+
+# Install other dependencies
+pip install tqdm plyfile
+pip install "numpy<2"  
+pip install scipy
+
+
+3. Apply the Patch 
+The default submodules are locked to old versions. You must overwrite them with the patched setup files provided in RTX5070_Patch:
+
+Copy RTX5070_Patch/setup_knn.py ➡️ Overwrite submodules/simple-knn/setup.py
+
+Copy RTX5070_Patch/setup_rasterizer.py ➡️ Overwrite submodules/diff-gaussian-rasterization/setup.py
+
+
+4. Install Submodules
+Use --no-build-isolation to ensure pip uses your installed PyTorch environment.
+
+Bash
+# Install Rasterizer
+pip install ./submodules/diff-gaussian-rasterization --no-build-isolation
+
+# Install Simple-KNN
+pip install ./submodules/simple-knn --no-build-isolation
+
+
+5. Run Training
+Bash
+python train.py -s <path_to_your_dataset>
+
+
+📝 Changes Made
+Fixed 3DGS Crash on Blackwell: Replaced the crashing distCUDA2 C++ function with Python's scipy.spatial.KDTree in scene/gaussian_model.py. This bypasses the memory allocation error on RTX 50 series.
+
+Enabled JIT Compilation: Modified setup.py in submodules to use -gencode=arch=compute_89,code=compute_89. This allows the driver to JIT compile PTX for the new Blackwell architecture (sm_120) at runtime.
+
+
+
+
+
+
+
+
 # 3D Gaussian Splatting for Real-Time Radiance Field Rendering
 Bernhard Kerbl*, Georgios Kopanas*, Thomas Leimkühler, George Drettakis (* indicates equal contribution)<br>
 | [Webpage](https://repo-sam.inria.fr/fungraph/3d-gaussian-splatting/) | [Full Paper](https://repo-sam.inria.fr/fungraph/3d-gaussian-splatting/3d_gaussian_splatting_high.pdf) | [Video](https://youtu.be/T_kXY43VZnk) | [Other GRAPHDECO Publications](http://www-sop.inria.fr/reves/publis/gdindex.php) | [FUNGRAPH project page](https://fungraph.inria.fr) |<br>
