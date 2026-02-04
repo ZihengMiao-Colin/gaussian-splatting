@@ -17,13 +17,13 @@ I successfully ran the training on **Windows** with the following configuration:
 ## 🛠️ How to use
 
 ### 1. Clone the repo
-```bash
+```Bash
 git clone --recursive [https://github.com/ZihengMiao-Colin/gaussian-splatting](https://github.com/ZihengMiao-Colin/gaussian-splatting)
 cd gaussian-splatting
-
+```
 
 ### 2. Setup Environment
-Bash
+```Bash
 # Create conda environment
 conda create -n gs_5070 python=3.10
 conda activate gs_5070
@@ -35,7 +35,7 @@ pip install torch==2.5.1 torchvision==0.20.1 torchaudio==2.5.1 --index-url [http
 pip install tqdm plyfile
 pip install "numpy<2"  
 pip install scipy
-
+```
 
 ### 3. Apply the Patch 
 The default submodules are locked to old versions. You must overwrite them with the patched setup files provided in RTX5070_Patch:
@@ -48,18 +48,18 @@ Copy RTX5070_Patch/setup_rasterizer.py ➡️ Overwrite submodules/diff-gaussian
 ### 4. Install Submodules
 Use --no-build-isolation to ensure pip uses your installed PyTorch environment.
 
-Bash
+```Bash
 # Install Rasterizer
 pip install ./submodules/diff-gaussian-rasterization --no-build-isolation
 
 # Install Simple-KNN
 pip install ./submodules/simple-knn --no-build-isolation
-
+```
 
 ### 5. Run Training
-Bash
+```Bash
 python train.py -s <path_to_your_dataset>
-
+```
 
 📝 Changes Made
 Fixed 3DGS Crash on Blackwell: Replaced the crashing distCUDA2 C++ function with Python's scipy.spatial.KDTree in scene/gaussian_model.py. This bypasses the memory allocation error on RTX 50 series.
@@ -68,7 +68,7 @@ Enabled JIT Compilation: Modified setup.py in submodules to use -gencode=arch=co
 
 
 
-
+👇 Original Documentation Below 👇
 
 
 
