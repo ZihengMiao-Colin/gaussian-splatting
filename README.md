@@ -62,6 +62,7 @@ python train.py -s <path_to_your_dataset>
 ```
 
 📝 Changes Made
+
 Fixed 3DGS Crash on Blackwell: Replaced the crashing distCUDA2 C++ function with Python's scipy.spatial.KDTree in scene/gaussian_model.py. This bypasses the memory allocation error on RTX 50 series.
 
 Enabled JIT Compilation: Modified setup.py in submodules to use -gencode=arch=compute_89,code=compute_89. This allows the driver to JIT compile PTX for the new Blackwell architecture (sm_120) at runtime.
